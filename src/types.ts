@@ -26,16 +26,3 @@ export type GanttState = {
   rows: GanttRow[];
   blocks: GanttBlock[];
 };
-
-export const BLOCK_EXPORT_COLUMNS: Array<keyof GanttBlock | 'row_order'> = [
-  'row_title',
-  'block_label',
-  'start_date',
-  'end_date',
-  'level',
-  'block_id',
-  'custom_color',
-  'note',
-  'progress',
-  'row_order'
-];

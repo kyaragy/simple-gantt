@@ -1,6 +1,5 @@
 import Papa from 'papaparse';
 import type { GanttBlock, GanttRow } from '../types';
-import { BLOCK_EXPORT_COLUMNS } from '../types';
 import { isValidYmd } from './date';
 
 export type CsvImportResult = {
@@ -13,6 +12,19 @@ const REQUIRED_FIELDS = [
   'block_label',
   'start_date',
   'end_date'
+] as const;
+
+const CSV_EXPORT_COLUMNS = [
+  'row_title',
+  'block_group',
+  'block_label',
+  'start_date',
+  'end_date',
+  'block_id',
+  'custom_color',
+  'note',
+  'progress',
+  'row_order'
 ] as const;
 
 export function parseCsvToState(text: string): CsvImportResult {
@@ -62,6 +74,7 @@ export function parseCsvToState(text: string): CsvImportResult {
       block_id: record.block_id?.trim() || `blk-${Date.now()}-${idx + 1}`,
       block_label: record.block_label.trim(),
       level:
+        record.block_group?.trim() ||
         record.level?.trim() ||
         record.level1?.trim() ||
         record.level2?.trim() ||
@@ -91,15 +104,17 @@ export function exportStateToCsv(rows: GanttRow[], blocks: GanttBlock[]): string
 
   const data = blocks.map((block) => {
     const rec: Record<string, string | number> = {};
-    for (const column of BLOCK_EXPORT_COLUMNS) {
+    for (const column of CSV_EXPORT_COLUMNS) {
       if (column === 'row_order') {
         rec.row_order = rowOrderMap.get(block.row_title) ?? '';
+      } else if (column === 'block_group') {
+        rec.block_group = block.level ?? '';
       } else {
-        rec[column] = (block[column] as string | number | undefined) ?? '';
+        rec[column] = (block[column as keyof GanttBlock] as string | number | undefined) ?? '';
       }
     }
     return rec;
   });
 
-  return Papa.unparse(data, { columns: BLOCK_EXPORT_COLUMNS as string[] });
+  return Papa.unparse(data, { columns: [...CSV_EXPORT_COLUMNS] });
 }
