@@ -59,6 +59,8 @@ const EMPTY_ROW_HEIGHT = 56;
 const HIERARCHY_BAND_HORIZONTAL_PADDING_DAYS = 2;
 const HIERARCHY_BAND_VERTICAL_PADDING_PX = 10;
 const HIERARCHY_BAND_MIN_GAP_PX = 2;
+const HIERARCHY_ROW_EXTRA_TOP_PX = 6;
+const HIERARCHY_ROW_EXTRA_BOTTOM_PX = 6;
 
 type PositionedBlock = {
   block: GanttBlock;
@@ -317,12 +319,12 @@ function layoutBlocks(
       groupTop += HIERARCHY_GROUP_GAP;
     }
   });
-  const rowHeight = Math.max(
+  let rowHeight = Math.max(
     EMPTY_ROW_HEIGHT,
     groupTop + BLOCK_BOTTOM_PADDING
   );
 
-  const hierarchyBands = hierarchyBandRaw.map((band, index, arr) => {
+  let hierarchyBands = hierarchyBandRaw.map((band, index, arr) => {
     const prev = index > 0 ? arr[index - 1] : null;
     const next = index < arr.length - 1 ? arr[index + 1] : null;
     const upperLimit = prev
@@ -345,6 +347,17 @@ function layoutBlocks(
       height: safeBottom - top
     };
   });
+
+  if (hierarchyBands.length > 0) {
+    for (const block of positioned) {
+      block.top += HIERARCHY_ROW_EXTRA_TOP_PX;
+    }
+    hierarchyBands = hierarchyBands.map((band) => ({
+      ...band,
+      top: band.top + HIERARCHY_ROW_EXTRA_TOP_PX
+    }));
+    rowHeight += HIERARCHY_ROW_EXTRA_TOP_PX + HIERARCHY_ROW_EXTRA_BOTTOM_PX;
+  }
 
   return { positioned, hierarchyBands, rowHeight };
 }
