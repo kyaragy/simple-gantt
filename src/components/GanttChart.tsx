@@ -56,8 +56,8 @@ const BLOCK_BOTTOM_PADDING = 8;
 const BLOCK_ROW_GAP = 6;
 const HIERARCHY_GROUP_GAP = 10;
 const EMPTY_ROW_HEIGHT = 56;
-const HIERARCHY_BAND_HORIZONTAL_PADDING_DAYS = 2;
 const HIERARCHY_BAND_VERTICAL_PADDING_PX = 10;
+const HIERARCHY_BAND_HORIZONTAL_PADDING_PX = HIERARCHY_BAND_VERTICAL_PADDING_PX;
 const HIERARCHY_BAND_MIN_GAP_PX = 2;
 const HIERARCHY_ROW_EXTRA_TOP_PX = 6;
 const HIERARCHY_ROW_EXTRA_BOTTOM_PX = 6;
@@ -295,14 +295,8 @@ function layoutBlocks(
     const groupHeight =
       localLaneCount * BLOCK_HEIGHT + Math.max(0, localLaneCount - 1) * BLOCK_ROW_GAP;
     if (visibleItemCount > 0 && group.hierarchyKey) {
-      const bandStartIndex = Math.max(
-        0,
-        minStartIndex - HIERARCHY_BAND_HORIZONTAL_PADDING_DAYS
-      );
-      const bandEndExclusive = Math.min(
-        visibleDayCount,
-        maxEndIndex + 1 + HIERARCHY_BAND_HORIZONTAL_PADDING_DAYS
-      );
+      const bandStartIndex = Math.max(0, minStartIndex);
+      const bandEndExclusive = Math.min(visibleDayCount, maxEndIndex + 1);
       const leftPercent = (bandStartIndex / visibleDayCount) * 100;
       const widthPercent = ((bandEndExclusive - bandStartIndex) / visibleDayCount) * 100;
       hierarchyBandRaw.push({
@@ -428,8 +422,8 @@ function SortableRow({
               key={`${row.id}-${band.key}`}
               className="hierarchy-band"
               style={{
-                left: `${band.leftPercent}%`,
-                width: `${band.widthPercent}%`,
+                left: `calc(${band.leftPercent}% - ${HIERARCHY_BAND_HORIZONTAL_PADDING_PX}px)`,
+                width: `calc(${band.widthPercent}% + ${HIERARCHY_BAND_HORIZONTAL_PADDING_PX * 2}px)`,
                 top: band.top,
                 height: band.height
               }}
